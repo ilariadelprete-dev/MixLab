@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "units": {
+    "volume": ["ml", "cl", "oz"],
+    "count": ["pcs", "dashes", "drops", "scoops", "sprigs", "leaves"],
+    "other": ["barspoon"]
+  },
+  "ingredients": [
+    { "id": "spirit_gin_hendricks", "name": "Gin Hendrick's", "category": "Spirit", "subCategory": "Gin", "alcoholic": true, "abv": 41.4, "brand": "Hendrick's", "country": "Scotland", "defaultUnit": "ml", "tags": ["gin", "premium"], "synonyms": ["Hendricks Gin"] },
+    { "id": "spirit_gin_bombay_sapphire", "name": "Gin Bombay Sapphire", "category": "Spirit", "subCategory": "Gin", "alcoholic": true, "abv": 40, "brand": "Bombay Sapphire", "country": "UK", "defaultUnit": "ml", "tags": ["gin"], "synonyms": [] },
+    { "id": "spirit_gin_tanqueray", "name": "Gin Tanqueray", "category": "Spirit", "subCategory": "Gin", "alcoholic": true, "abv": 47.3, "brand": "Tanqueray", "country": "UK", "defaultUnit": "ml", "tags": ["gin", "london_dry"], "synonyms": [] },
+    { "id": "spirit_gin_beefeater", "name": "Gin Beefeater", "category": "Spirit", "subCategory": "Gin", "alcoholic": true, "abv": 40, "brand": "Beefeater", "country": "UK", "defaultUnit": "ml", "tags": ["gin", "london_dry"], "synonyms": [] },
+    { "id": "spirit_gin_plymouth", "name": "Gin Plymouth", "category": "Spirit", "subCategory": "Gin", "alcoholic": true, "abv": 41.2, "brand": "Plymouth", "country": "UK", "defaultUnit": "ml", "tags": ["gin"], "synonyms": [] },
+
+    { "id": "spirit_vodka_absolut", "name": "Vodka Absolut", "category": "Spirit", "subCategory": "Vodka", "alcoholic": true, "abv": 40, "brand": "Absolut", "country": "Sweden", "defaultUnit": "ml", "tags": ["vodka"], "synonyms": [] },
+    { "id": "spirit_vodka_smirnoff", "name": "Vodka Smirnoff", "category": "Spirit", "subCategory": "Vodka", "alcoholic": true, "abv": 37.5, "brand": "Smirnoff", "country": "Global", "defaultUnit": "ml", "tags": ["vodka"], "synonyms": [] },
+    { "id": "spirit_vodka_belvedere", "name": "Vodka Belvedere", "category": "Spirit", "subCategory": "Vodka", "alcoholic": true, "abv": 40, "brand": "Belvedere", "country": "Poland", "defaultUnit": "ml", "tags": ["vodka", "premium"], "synonyms": [] },
+    { "id": "spirit_vodka_grey_goose", "name": "Vodka Grey Goose", "category": "Spirit", "subCategory": "Vodka", "alcoholic": true, "abv": 40, "brand": "Grey Goose", "country": "France", "defaultUnit": "ml", "tags": ["vodka", "premium"], "synonyms": [] },
+
+    { "id": "spirit_rum_bacardi_carta_blanca", "name": "Rum Bacardí Carta Blanca", "category": "Spirit", "subCategory": "Rum", "alcoholic": true, "abv": 37.5, "brand": "Bacardí", "country": "Puerto Rico", "defaultUnit": "ml", "tags": ["rum", "white_rum"], "synonyms": ["Bacardi Bianco", "White Rum"] },
+    { "id": "spirit_rum_havana_club_3", "name": "Rum Havana Club 3 Años", "category": "Spirit", "subCategory": "Rum", "alcoholic": true, "abv": 40, "brand": "Havana Club", "country": "Cuba", "defaultUnit": "ml", "tags": ["rum", "white_rum"], "synonyms": [] },
+    { "id": "spirit_rum_havana_club_7", "name": "Rum Havana Club 7 Años", "category": "Spirit", "subCategory": "Rum", "alcoholic": true, "abv": 40, "brand": "Havana Club", "country": "Cuba", "defaultUnit": "ml", "tags": ["rum", "aged_rum"], "synonyms": [] },
+    { "id": "spirit_rum_captain_morgan_spiced", "name": "Rum Captain Morgan Spiced", "category": "Spirit", "subCategory": "Rum", "alcoholic": true, "abv": 35, "brand": "Captain Morgan", "country": "Global", "defaultUnit": "ml", "tags": ["rum", "spiced"], "synonyms": [] },
+
+    { "id": "spirit_tequila_jose_cuervo_especial", "name": "Tequila Jose Cuervo Especial", "category": "Spirit", "subCategory": "Tequila", "alcoholic": true, "abv": 38, "brand": "Jose Cuervo", "country": "Mexico", "defaultUnit": "ml", "tags": ["tequila", "mixto"], "synonyms": [] },
+    { "id": "spirit_tequila_patron_silver", "name": "Tequila Patrón Silver", "category": "Spirit", "subCategory": "Tequila", "alcoholic": true, "abv": 40, "brand": "Patrón", "country": "Mexico", "defaultUnit": "ml", "tags": ["tequila", "blanco", "premium"], "synonyms": [] },
+    { "id": "spirit_tequila_don_julio_blanco", "name": "Tequila Don Julio Blanco", "category": "Spirit", "subCategory": "Tequila", "alcoholic": true, "abv": 38, "brand": "Don Julio", "country": "Mexico", "defaultUnit": "ml", "tags": ["tequila", "blanco"], "synonyms": [] },
+
+    { "id": "spirit_whiskey_jack_daniels", "name": "Tennessee Whiskey Jack Daniel's", "category": "Spirit", "subCategory": "Whiskey", "alcoholic": true, "abv": 40, "brand": "Jack Daniel's", "country": "USA", "defaultUnit": "ml", "tags": ["whiskey", "tennessee"], "synonyms": ["Jack Daniels"] },
+    { "id": "spirit_whiskey_jameson", "name": "Irish Whiskey Jameson", "category": "Spirit", "subCategory": "Whiskey", "alcoholic": true, "abv": 40, "brand": "Jameson", "country": "Ireland", "defaultUnit": "ml", "tags": ["whiskey", "irish"], "synonyms": [] },
+    { "id": "spirit_whiskey_johnnie_walker_black", "name": "Scotch Whisky Johnnie Walker Black Label", "category": "Spirit", "subCategory": "Whisky", "alcoholic": true, "abv": 40, "brand": "Johnnie Walker", "country": "Scotland", "defaultUnit": "ml", "tags": ["whisky", "scotch", "blended"], "synonyms": [] },
+    { "id": "spirit_whiskey_glenfiddich_12", "name": "Single Malt Scotch Glenfiddich 12", "category": "Spirit", "subCategory": "Whisky", "alcoholic": true, "abv": 40, "brand": "Glenfiddich", "country": "Scotland", "defaultUnit": "ml", "tags": ["whisky", "single_malt"], "synonyms": [] },
+    { "id": "spirit_bourbon_jim_beam", "name": "Bourbon Jim Beam", "category": "Spirit", "subCategory": "Bourbon", "alcoholic": true, "abv": 40, "brand": "Jim Beam", "country": "USA", "defaultUnit": "ml", "tags": ["bourbon"], "synonyms": [] },
+    { "id": "spirit_bourbon_makers_mark", "name": "Bourbon Maker's Mark", "category": "Spirit", "subCategory": "Bourbon", "alcoholic": true, "abv": 45, "brand": "Maker's Mark", "country": "USA", "defaultUnit": "ml", "tags": ["bourbon"], "synonyms": [] },
+    { "id": "spirit_rye_whiskey_bulleit_rye", "name": "Rye Whiskey Bulleit Rye", "category": "Spirit", "subCategory": "Rye Whiskey", "alcoholic": true, "abv": 45, "brand": "Bulleit", "country": "USA", "defaultUnit": "ml", "tags": ["rye"], "synonyms": [] },
+
+    { "id": "spirit_cognac_hennessy_vs", "name": "Cognac Hennessy VS", "category": "Spirit", "subCategory": "Cognac", "alcoholic": true, "abv": 40, "brand": "Hennessy", "country": "France", "defaultUnit": "ml", "tags": ["cognac"], "synonyms": [] },
+    { "id": "spirit_brandy_vecchia_romagna", "name": "Brandy Vecchia Romagna", "category": "Spirit", "subCategory": "Brandy", "alcoholic": true, "abv": 38, "brand": "Vecchia Romagna", "country": "Italy", "defaultUnit": "ml", "tags": ["brandy"], "synonyms": [] },
+
+    { "id": "liqueur_triple_sec_cointreau", "name": "Cointreau (Triple Sec)", "category": "Liqueur", "subCategory": "Orange Liqueur", "alcoholic": true, "abv": 40, "brand": "Cointreau", "country": "France", "defaultUnit": "ml", "tags": ["triple_sec"], "synonyms": ["Triple Sec"] },
+    { "id": "liqueur_orange_grand_marnier", "name": "Grand Marnier", "category": "Liqueur", "subCategory": "Orange Liqueur", "alcoholic": true, "abv": 40, "brand": "Grand Marnier", "country": "France", "defaultUnit": "ml", "tags": ["orange_liqueur"], "synonyms": [] },
+    { "id": "liqueur_coffee_kahlua", "name": "Kahlúa (Liquore al Caffè)", "category": "Liqueur", "subCategory": "Coffee Liqueur", "alcoholic": true, "abv": 20, "brand": "Kahlúa", "country": "Mexico", "defaultUnit": "ml", "tags": ["coffee_liqueur"], "synonyms": ["Kahlua"] },
+    { "id": "liqueur_almond_amaretto_disaronno", "name": "Amaretto Disaronno", "category": "Liqueur", "subCategory": "Nut Liqueur", "alcoholic": true, "abv": 28, "brand": "Disaronno", "country": "Italy", "defaultUnit": "ml", "tags": ["amaretto"], "synonyms": [] },
+    { "id": "liqueur_cream_baileys", "name": "Baileys Irish Cream", "category": "Liqueur", "subCategory": "Cream Liqueur", "alcoholic": true, "abv": 17, "brand": "Baileys", "country": "Ireland", "defaultUnit": "ml", "tags": ["cream_liqueur"], "synonyms": [] },
+    { "id": "liqueur_peach_schnapps", "name": "Peach Schnapps", "category": "Liqueur", "subCategory": "Fruit Liqueur", "alcoholic": true, "abv": 18, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["peach"], "synonyms": [] },
+    { "id": "liqueur_elderflower_st_germain", "name": "St-Germain (Liquore ai Fiori di Sambuco)", "category": "Liqueur", "subCategory": "Floral Liqueur", "alcoholic": true, "abv": 20, "brand": "St-Germain", "country": "France", "defaultUnit": "ml", "tags": ["elderflower"], "synonyms": ["Liquore al sambuco"] },
+    { "id": "liqueur_anise_sambuca", "name": "Sambuca", "category": "Liqueur", "subCategory": "Anise Liqueur", "alcoholic": true, "abv": 38, "brand": null, "country": "Italy", "defaultUnit": "ml", "tags": ["anise"], "synonyms": [] },
+    { "id": "liqueur_melon_midori", "name": "Midori (Liquore al Melone)", "category": "Liqueur", "subCategory": "Fruit Liqueur", "alcoholic": true, "abv": 20, "brand": "Midori", "country": "Japan", "defaultUnit": "ml", "tags": ["melon"], "synonyms": [] },
+    { "id": "liqueur_banana", "name": "Liquore alla Banana", "category": "Liqueur", "subCategory": "Fruit Liqueur", "alcoholic": true, "abv": 20, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["banana"], "synonyms": [] },
+
+    { "id": "aperitif_campari", "name": "Campari", "category": "Amaro/Aperitif", "subCategory": "Bitter Aperitif", "alcoholic": true, "abv": 25, "brand": "Campari", "country": "Italy", "defaultUnit": "ml", "tags": ["amaro", "bitter"], "synonyms": [] },
+    { "id": "aperitif_aperol", "name": "Aperol", "category": "Amaro/Aperitif", "subCategory": "Aperitif", "alcoholic": true, "abv": 11, "brand": "Aperol", "country": "Italy", "defaultUnit": "ml", "tags": ["aperitif"], "synonyms": [] },
+    { "id": "vermouth_sweet_martini_rosso", "name": "Vermouth Rosso Martini", "category": "Fortified Wine", "subCategory": "Sweet Vermouth", "alcoholic": true, "abv": 15, "brand": "Martini", "country": "Italy", "defaultUnit": "ml", "tags": ["vermouth", "sweet"], "synonyms": ["Sweet Vermouth"] },
+    { "id": "vermouth_dry_noilly_prat", "name": "Vermouth Dry Noilly Prat", "category": "Fortified Wine", "subCategory": "Dry Vermouth", "alcoholic": true, "abv": 18, "brand": "Noilly Prat", "country": "France", "defaultUnit": "ml", "tags": ["vermouth", "dry"], "synonyms": ["Dry Vermouth"] },
+
+    { "id": "amaro_averna", "name": "Amaro Averna", "category": "Amaro/Aperitif", "subCategory": "Amaro", "alcoholic": true, "abv": 29, "brand": "Averna", "country": "Italy", "defaultUnit": "ml", "tags": ["amaro"], "synonyms": [] },
+    { "id": "amaro_montenegro", "name": "Amaro Montenegro", "category": "Amaro/Aperitif", "subCategory": "Amaro", "alcoholic": true, "abv": 23, "brand": "Montenegro", "country": "Italy", "defaultUnit": "ml", "tags": ["amaro"], "synonyms": [] },
+    { "id": "amaro_del_capo", "name": "Vecchio Amaro del Capo", "category": "Amaro/Aperitif", "subCategory": "Amaro", "alcoholic": true, "abv": 35, "brand": "Caffo", "country": "Italy", "defaultUnit": "ml", "tags": ["amaro"], "synonyms": [] },
+    { "id": "amaro_cynar", "name": "Cynar", "category": "Amaro/Aperitif", "subCategory": "Amaro", "alcoholic": true, "abv": 16.5, "brand": "Cynar", "country": "Italy", "defaultUnit": "ml", "tags": ["amaro", "artichoke"], "synonyms": [] },
+    { "id": "amaro_fernet_branca", "name": "Fernet-Branca", "category": "Amaro/Aperitif", "subCategory": "Amaro", "alcoholic": true, "abv": 39, "brand": "Branca", "country": "Italy", "defaultUnit": "ml", "tags": ["amaro", "fernet"], "synonyms": ["Fernet"] },
+    { "id": "amaro_ramazzotti", "name": "Amaro Ramazzotti", "category": "Amaro/Aperitif", "subCategory": "Amaro", "alcoholic": true, "abv": 30, "brand": "Ramazzotti", "country": "Italy", "defaultUnit": "ml", "tags": ["amaro"], "synonyms": [] },
+    { "id": "amaro_lucano", "name": "Amaro Lucano", "category": "Amaro/Aperitif", "subCategory": "Amaro", "alcoholic": true, "abv": 28, "brand": "Lucano", "country": "Italy", "defaultUnit": "ml", "tags": ["amaro"], "synonyms": [] },
+    { "id": "amaro_jaegermeister", "name": "Jägermeister", "category": "Amaro/Aperitif", "subCategory": "Herbal Liqueur", "alcoholic": true, "abv": 35, "brand": "Jägermeister", "country": "Germany", "defaultUnit": "ml", "tags": ["herbal"], "synonyms": ["Jaegermeister"] },
+
+    { "id": "sparkling_prosecco", "name": "Prosecco", "category": "Wine", "subCategory": "Sparkling Wine", "alcoholic": true, "abv": 11, "brand": null, "country": "Italy", "defaultUnit": "ml", "tags": ["sparkling"], "synonyms": [] },
+    { "id": "wine_red_generic", "name": "Vino Rosso", "category": "Wine", "subCategory": "Red Wine", "alcoholic": true, "abv": 12.5, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["wine"], "synonyms": [] },
+
+    { "id": "mixer_tonic_water", "name": "Acqua Tonica", "category": "Non-Alcoholic", "subCategory": "Mixer", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["mixer", "carbonated"], "synonyms": ["Tonic Water"] },
+    { "id": "mixer_soda_water", "name": "Soda / Acqua Frizzante", "category": "Non-Alcoholic", "subCategory": "Mixer", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["mixer", "carbonated"], "synonyms": ["Club Soda"] },
+    { "id": "mixer_ginger_beer", "name": "Ginger Beer", "category": "Non-Alcoholic", "subCategory": "Mixer", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["mixer", "spicy"], "synonyms": [] },
+    { "id": "mixer_ginger_ale", "name": "Ginger Ale", "category": "Non-Alcoholic", "subCategory": "Mixer", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["mixer"], "synonyms": [] },
+    { "id": "mixer_cola", "name": "Cola", "category": "Non-Alcoholic", "subCategory": "Soft Drink", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["soft_drink"], "synonyms": ["Coca-Cola", "Pepsi"] },
+    { "id": "mixer_lemonade", "name": "Lemonade", "category": "Non-Alcoholic", "subCategory": "Soft Drink", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["soft_drink"], "synonyms": [] },
+    { "id": "mixer_orange_soda", "name": "Aranciata", "category": "Non-Alcoholic", "subCategory": "Soft Drink", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["soft_drink"], "synonyms": [] },
+
+    { "id": "juice_lime", "name": "Succo di Lime", "category": "Non-Alcoholic", "subCategory": "Juice", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["citrus"], "synonyms": ["Lime Juice"] },
+    { "id": "juice_lemon", "name": "Succo di Limone", "category": "Non-Alcoholic", "subCategory": "Juice", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["citrus"], "synonyms": ["Lemon Juice"] },
+    { "id": "juice_orange", "name": "Succo d'Arancia", "category": "Non-Alcoholic", "subCategory": "Juice", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["citrus"], "synonyms": ["Orange Juice"] },
+    { "id": "juice_pineapple", "name": "Succo d'Ananas", "category": "Non-Alcoholic", "subCategory": "Juice", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["tropical"], "synonyms": ["Pineapple Juice"] },
+    { "id": "juice_cranberry", "name": "Succo di Cranberry", "category": "Non-Alcoholic", "subCategory": "Juice", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["berry"], "synonyms": ["Cranberry Juice"] },
+    { "id": "juice_grapefruit", "name": "Succo di Pompelmo", "category": "Non-Alcoholic", "subCategory": "Juice", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["citrus"], "synonyms": ["Grapefruit Juice"] },
+    { "id": "tomato_juice", "name": "Succo di Pomodoro", "category": "Non-Alcoholic", "subCategory": "Juice", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["savory"], "synonyms": ["Tomato Juice"] },
+
+    { "id": "sweetener_simple_syrup", "name": "Sciroppo di Zucchero (Simple Syrup)", "category": "Non-Alcoholic", "subCategory": "Sweetener", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["syrup"], "synonyms": ["Simple Syrup", "Sciroppo 1:1"] },
+    { "id": "sweetener_sugar", "name": "Zucchero", "category": "Non-Alcoholic", "subCategory": "Sweetener", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "g", "tags": ["sweetener"], "synonyms": ["Sugar"] },
+    { "id": "sweetener_honey", "name": "Miele", "category": "Non-Alcoholic", "subCategory": "Sweetener", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["sweetener"], "synonyms": ["Honey"] },
+    { "id": "sweetener_agave_syrup", "name": "Sciroppo d'Agave", "category": "Non-Alcoholic", "subCategory": "Sweetener", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["sweetener"], "synonyms": ["Agave Syrup"] },
+    { "id": "syrup_grenadine", "name": "Granatina (Grenadine)", "category": "Non-Alcoholic", "subCategory": "Syrup", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "ml", "tags": ["syrup", "pomegranate"], "synonyms": ["Grenadine"] },
+
+    { "id": "fruit_lime", "name": "Lime", "category": "Non-Alcoholic", "subCategory": "Fruit", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "pcs", "tags": ["citrus"], "synonyms": [] },
+    { "id": "fruit_lemon", "name": "Limone", "category": "Non-Alcoholic", "subCategory": "Fruit", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "pcs", "tags": ["citrus"], "synonyms": [] },
+    { "id": "fruit_orange", "name": "Arancia", "category": "Non-Alcoholic", "subCategory": "Fruit", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "pcs", "tags": ["citrus"], "synonyms": [] },
+
+    { "id": "herb_mint", "name": "Menta", "category": "Non-Alcoholic", "subCategory": "Herb", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "sprigs", "tags": ["herb", "fresh"], "synonyms": ["Mentha", "Fresh Mint"] },
+    { "id": "herb_basil", "name": "Basilico", "category": "Non-Alcoholic", "subCategory": "Herb", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "leaves", "tags": ["herb", "fresh"], "synonyms": ["Fresh Basil"] },
+
+    { "id": "spice_angostura_bitters", "name": "Angostura Bitters", "category": "Bitters", "subCategory": "Aromatic Bitters", "alcoholic": true, "abv": 44.7, "brand": "Angostura", "country": "Trinidad and Tobago", "defaultUnit": "dashes", "tags": ["bitters"], "synonyms": ["Aromatic Bitters"] },
+    { "id": "bitters_orange", "name": "Orange Bitters", "category": "Bitters", "subCategory": "Citrus Bitters", "alcoholic": true, "abv": 28, "brand": null, "country": null, "defaultUnit": "dashes", "tags": ["bitters"], "synonyms": [] },
+
+    { "id": "other_ice", "name": "Ghiaccio", "category": "Other", "subCategory": "Ice", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "pcs", "tags": ["ice"], "synonyms": ["Ice"] },
+    { "id": "other_salt", "name": "Sale", "category": "Other", "subCategory": "Seasoning", "alcoholic": false, "abv": 0, "brand": null, "country": null, "defaultUnit": "g", "tags": ["seasoning"], "synonyms": [] }
+  ]
+}

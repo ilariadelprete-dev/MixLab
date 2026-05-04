@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "recipes": [
+    {
+      "id": "cocktail_gin_tonic",
+      "name": "Gin Tonic",
+      "glass": "Highball",
+      "method": "Build",
+      "ice": "Cubed",
+      "ingredients": [
+        { "ingredientId": "spirit_gin_hendricks", "amount": 50, "unit": "ml" },
+        { "ingredientId": "mixer_tonic_water", "amount": 150, "unit": "ml" },
+        { "ingredientId": "fruit_lime", "amount": 1, "unit": "pcs", "prep": "wedge (optional)" }
+      ],
+      "garnish": ["Spicchio di lime (opzionale)"],
+      "instructions": [
+        "Riempi il bicchiere di ghiaccio.",
+        "Versa il gin.",
+        "Completa con acqua tonica ben fredda.",
+        "Mescola delicatamente e guarnisci."
+      ],
+      "tags": ["classic", "easy", "refreshing"]
+    },
+    {
+      "id": "cocktail_negroni",
+      "name": "Negroni",
+      "glass": "Rocks",
+      "method": "Stir",
+      "ice": "Large cube",
+      "ingredients": [
+        { "ingredientId": "spirit_gin_tanqueray", "amount": 30, "unit": "ml" },
+        { "ingredientId": "aperitif_campari", "amount": 30, "unit": "ml" },
+        { "ingredientId": "vermouth_sweet_martini_rosso", "amount": 30, "unit": "ml" },
+        { "ingredientId": "fruit_orange", "amount": 1, "unit": "pcs", "prep": "peel (garnish)" }
+      ],
+      "garnish": ["Scorza d’arancia"],
+      "instructions": [
+        "Raffredda un bicchiere rocks con ghiaccio.",
+        "In un mixing glass con ghiaccio versa gli ingredienti e mescola.",
+        "Filtra nel bicchiere con ghiaccio nuovo.",
+        "Guarnisci con scorza d’arancia."
+      ],
+      "tags": ["classic", "italian", "bitter"]
+    },
+    {
+      "id": "cocktail_aperol_spritz",
+      "name": "Aperol Spritz",
+      "glass": "Wine glass",
+      "method": "Build",
+      "ice": "Cubed",
+      "ingredients": [
+        { "ingredientId": "aperitif_aperol", "amount": 60, "unit": "ml" },
+        { "ingredientId": "sparkling_prosecco", "amount": 90, "unit": "ml" },
+        { "ingredientId": "mixer_soda_water", "amount": 30, "unit": "ml" },
+        { "ingredientId": "fruit_orange", "amount": 1, "unit": "pcs", "prep": "slice (garnish)" }
+      ],
+      "garnish": ["Fetta d’arancia"],
+      "instructions": [
+        "Riempi il calice di ghiaccio.",
+        "Versa Prosecco, poi Aperol, poi un splash di soda.",
+        "Mescola delicatamente e guarnisci."
+      ],
+      "tags": ["aperitif", "easy", "sparkling"]
+    },
+    {
+      "id": "cocktail_mojito",
+      "name": "Mojito",
+      "glass": "Highball",
+      "method": "Build",
+      "ice": "Crushed",
+      "ingredients": [
+        { "ingredientId": "herb_mint", "amount": 2, "unit": "sprigs" },
+        { "ingredientId": "sweetener_simple_syrup", "amount": 20, "unit": "ml" },
+        { "ingredientId": "juice_lime", "amount": 25, "unit": "ml" },
+        { "ingredientId": "spirit_rum_havana_club_3", "amount": 50, "unit": "ml" },
+        { "ingredientId": "mixer_soda_water", "amount": 80, "unit": "ml" }
+      ],
+      "garnish": ["Menta"],
+      "instructions": [
+        "Pesta delicatamente menta, sciroppo e succo di lime nel bicchiere (senza distruggere la menta).",
+        "Aggiungi rum e ghiaccio tritato.",
+        "Completa con soda e mescola.",
+        "Guarnisci con menta."
+      ],
+      "tags": ["classic", "refreshing"]
+    },
+    {
+      "id": "cocktail_moscow_mule",
+      "name": "Moscow Mule",
+      "glass": "Mug / Highball",
+      "method": "Build",
+      "ice": "Cubed",
+      "ingredients": [
+        { "ingredientId": "spirit_vodka_absolut", "amount": 50, "unit": "ml" },
+        { "ingredientId": "juice_lime", "amount": 15, "unit": "ml" },
+        { "ingredientId": "mixer_ginger_beer", "amount": 150, "unit": "ml" }
+      ],
+      "garnish": ["Spicchio di lime (opzionale)"],
+      "instructions": [
+        "Riempi il bicchiere di ghiaccio.",
+        "Versa vodka e succo di lime.",
+        "Completa con ginger beer e mescola."
+      ],
+      "tags": ["easy", "spicy", "refreshing"]
+    },
+    {
+      "id": "cocktail_whiskey_sour",
+      "name": "Whiskey Sour",
+      "glass": "Rocks",
+      "method": "Shake",
+      "ice": "Cubed",
+      "ingredients": [
+        { "ingredientId": "spirit_bourbon_jim_beam", "amount": 50, "unit": "ml" },
+        { "ingredientId": "juice_lemon", "amount": 25, "unit": "ml" },
+        { "ingredientId": "sweetener_simple_syrup", "amount": 20, "unit": "ml" },
+        { "ingredientId": "spice_angostura_bitters", "amount": 2, "unit": "dashes", "optional": true }
+      ],
+      "garnish": ["Scorza di limone (opzionale)"],
+      "instructions": [
+        "Shakera con ghiaccio bourbon, limone e sciroppo.",
+        "Filtra in un rocks con ghiaccio.",
+        "Aggiungi Angostura se desideri."
+      ],
+      "tags": ["classic", "citrusy"]
+    },
+    {
+      "id": "cocktail_margarita",
+      "name": "Margarita",
+      "glass": "Cocktail",
+      "method": "Shake",
+      "ice": "None",
+      "ingredients": [
+        { "ingredientId": "spirit_tequila_patron_silver", "amount": 50, "unit": "ml" },
+        { "ingredientId": "liqueur_triple_sec_cointreau", "amount": 20, "unit": "ml" },
+        { "ingredientId": "juice_lime", "amount": 25, "unit": "ml" },
+        { "ingredientId": "other_salt", "amount": 1, "unit": "g", "optional": true, "prep": "for rim" }
+      ],
+      "garnish": ["Spicchio di lime (opzionale)"],
+      "instructions": [
+        "Se vuoi, fai il bordo di sale sul bicchiere.",
+        "Shakera con ghiaccio tequila, Cointreau e lime.",
+        "Filtra in coppetta raffreddata."
+      ],
+      "tags": ["classic", "citrusy", "tequila"]
+    },
+    {
+      "id": "cocktail_cosmopolitan",
+      "name": "Cosmopolitan",
+      "glass": "Cocktail",
+      "method": "Shake",
+      "ice": "None",
+      "ingredients": [
+        { "ingredientId": "spirit_vodka_absolut", "amount": 40, "unit": "ml" },
+        { "ingredientId": "liqueur_triple_sec_cointreau", "amount": 15, "unit": "ml" },
+        { "ingredientId": "juice_lime", "amount": 15, "unit": "ml" },
+        { "ingredientId": "juice_cranberry", "amount": 30, "unit": "ml" }
+      ],
+      "garnish": ["Scorza d’arancia (opzionale)"],
+      "instructions": [
+        "Shakera con ghiaccio tutti gli ingredienti.",
+        "Filtra in coppetta raffreddata.",
+        "Guarnisci con scorza d’arancia."
+      ],
+      "tags": ["classic", "vodka", "fruity"]
+    }
+  ]
+}

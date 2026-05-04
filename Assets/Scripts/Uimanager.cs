@@ -151,10 +151,16 @@ public class UIManager : MonoBehaviour
     // Attiva il pannello richiesto, nasconde tutti gli altri
     private void SwitchPanel(GameObject target)
     {
-        panelHome.SetActive(false);
-        panelInventory.SetActive(false);
-        panelDetail.SetActive(false);
-        panelAdd.SetActive(false);
+        if (panelHome != null) panelHome.SetActive(false);
+        if (panelInventory != null) panelInventory.SetActive(false);
+        if (panelDetail != null) panelDetail.SetActive(false);
+        if (panelAdd != null) panelAdd.SetActive(false);
+
+        if (target == null)
+        {
+            Debug.LogError("UIManager.SwitchPanel: target panel è null. Assegna i pannelli nell'Inspector.");
+            return;
+        }
 
         target.SetActive(true);
         _currentPanel = target;
