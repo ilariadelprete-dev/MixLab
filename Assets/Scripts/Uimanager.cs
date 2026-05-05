@@ -20,6 +20,8 @@ using TMPro;   // TextMeshPro — assicurati di averlo importato dal Package Man
 
 public class UIManager : MonoBehaviour
 {
+    private const string ResourcesImagesFolder = "IngredientsImages";
+
     // =========================================================
     //  RIFERIMENTI AI PANNELLI (assegna nell'Inspector)
     // =========================================================
@@ -61,6 +63,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_InputField  searchInput;
     [SerializeField] private Transform       spiritsListParent;
     [SerializeField] private GameObject      spiritRowPrefab;
+
+    [Header("--- Immagini ingredienti (Resources) ---")]
+    [Tooltip("Fallback se non troviamo lo sprite in Resources/IngredientsImages/<id>.")]
+    [SerializeField] private Sprite fallbackIngredientSprite;
 
     // =========================================================
     //  STATO INTERNO
@@ -118,26 +124,26 @@ public class UIManager : MonoBehaviour
 
     public void ShowHome()
     {
-        SwitchPanel(panelHome);
+        //SwitchPanel(panelHome);
         RefreshHome();
     }
 
     public void ShowInventory()
     {
-        SwitchPanel(panelInventory);
+        //SwitchPanel(panelInventory);
         RefreshInventory();
     }
 
     public void ShowDetail(Cocktail cocktail)
     {
         _selectedCocktail = cocktail;
-        SwitchPanel(panelDetail);
+        //SwitchPanel(panelDetail);
         RefreshDetail();
     }
 
     public void ShowAdd()
     {
-        SwitchPanel(panelAdd);
+        //SwitchPanel(panelAdd);
         RefreshAdd("");
     }
 
@@ -149,22 +155,22 @@ public class UIManager : MonoBehaviour
     }
 
     // Attiva il pannello richiesto, nasconde tutti gli altri
-    private void SwitchPanel(GameObject target)
-    {
-        if (panelHome != null) panelHome.SetActive(false);
-        if (panelInventory != null) panelInventory.SetActive(false);
-        if (panelDetail != null) panelDetail.SetActive(false);
-        if (panelAdd != null) panelAdd.SetActive(false);
+  //  private void SwitchPanel(GameObject target)
+  //  {
+    //    if (panelHome != null) panelHome.SetActive(false);
+     //   if (panelInventory != null) panelInventory.SetActive(false);
+      //  if (panelDetail != null) panelDetail.SetActive(false);
+       // if (panelAdd != null) panelAdd.SetActive(false);
 
-        if (target == null)
-        {
-            Debug.LogError("UIManager.SwitchPanel: target panel è null. Assegna i pannelli nell'Inspector.");
-            return;
-        }
+        //if (target == null)
+        //{
+         //   Debug.LogError("UIManager.SwitchPanel: target panel è null. Assegna i pannelli nell'Inspector.");
+          //  return;
+        //}
 
-        target.SetActive(true);
-        _currentPanel = target;
-    }
+        //target.SetActive(true);
+        //_currentPanel = target;
+    //}
 
     // =========================================================
     //  REFRESH — aggiornano i contenuti di ogni schermata
@@ -197,10 +203,19 @@ public class UIManager : MonoBehaviour
         {
             GameObject card = Instantiate(cocktailCardPrefab, cocktailListParent);
 
-            // Cerca i componenti nella card (dipende dal tuo prefab)
-            TextMeshProUGUI nameText  = card.transform.Find("TxtName")?.GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI metaText  = card.transform.Find("TxtMeta")?.GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI emojiText = card.transform.Find("TxtEmoji")?.GetComponent<TextMeshProUGUI>();
+            // Cerca i componenti nella card (supporta prefab diversi: es. `Ricetta.prefab`)
+            TextMeshProUGUI nameText =
+                card.transform.Find("TxtName")?.GetComponent<TextMeshProUGUI>() ??
+                card.transform.Find("Text (TMP) (3)")?.GetComponent<TextMeshProUGUI>() ??
+                card.transform.Find("Text (TMP)")?.GetComponent<TextMeshProUGUI>();
+
+            TextMeshProUGUI metaText =
+                card.transform.Find("TxtMeta")?.GetComponent<TextMeshProUGUI>() ??
+                card.transform.Find("Text (TMP) (1)")?.GetComponent<TextMeshProUGUI>();
+
+            TextMeshProUGUI emojiText =
+                card.transform.Find("TxtEmoji")?.GetComponent<TextMeshProUGUI>() ??
+                card.transform.Find("TxtEmoji/Text (TMP)")?.GetComponent<TextMeshProUGUI>();
 
             if (nameText)  nameText.text  = cocktail.displayName;
             if (emojiText) emojiText.text = cocktail.emoji;
@@ -334,6 +349,10 @@ public class UIManager : MonoBehaviour
             if (nameText)  nameText.text  = spirit.displayName;
             if (typeText)  typeText.text  = spirit.category;
             if (emojiText) emojiText.text = spirit.emoji;
+
+            // Immagine (nel prefab `Alcolico` si chiama "Immagine")
+            TryAssignIngredientImage(row.transform, spirit.id);
+
             if (addBtn)
             {
                 addBtn.interactable = !alreadyOwned;
@@ -370,5 +389,28 @@ public class UIManager : MonoBehaviour
             case Difficulty.Hard:   return "Difficile";
             default:                return "";
         }
+    }
+
+    private void TryAssignIngredientImage(Transform rowTransform, string ingredientId)
+    {
+        if (rowTransform == null || string.IsNullOrWhiteSpace(ingredientId))
+            return;
+
+        Image img =
+            rowTransform.Find("ImgIngredient")?.GetComponent<Image>() ??
+            rowTransform.Find("Immagine")?.GetComponent<Image>() ??
+            rowTransform.Find("Image")?.GetComponent<Image>();
+
+        if (img == null)
+            return;
+
+        string resourcePath = $"{ResourcesImagesFolder}/{ingredientId}";
+        Sprite s = Resources.Load<Sprite>(resourcePath) ?? fallbackIngredientSprite;
+        if (s == null)
+            return;
+
+        img.sprite = s;
+        img.preserveAspect = true;
+        img.enabled = true;
     }
 }

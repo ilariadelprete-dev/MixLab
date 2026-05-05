@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -10,18 +11,27 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public class IngredientSearchController : MonoBehaviour
 {
+    private const string ResourcesImagesFolder = "IngredientsImages";
+    private const string PersistentSubfolder = "Data";
+
     [Header("Input")]
     [SerializeField] private TMP_InputField searchInput;
 
-    [Header("Results UI")]
+    [Header("Results UI")] 
     [SerializeField] private Transform resultsParent;
     [SerializeField] private GameObject rowPrefab;
     [SerializeField] private bool hideAlreadyOwned = true;
     [SerializeField] private int maxResults = 60;
     [SerializeField] private float manualRowSpacing = 12f;
 
-    [Header("Data Source (StreamingAssets)")]
+    [Header("Data Source")]
     [SerializeField] private string ingredientsFileName = "ingredients.json";
+    [Tooltip("Se true: usa Application.persistentDataPath (copiando da StreamingAssets al primo avvio).")]
+    [SerializeField] private bool preferPersistentDataPath = true;
+
+    [Header("Row Image (optional)")]
+    [Tooltip("Se non troviamo lo sprite in Resources/IngredientsImages/<id>, usiamo questo fallback (se assegnato).")]
+    [SerializeField] private Sprite fallbackIngredientSprite;
 
     private readonly List<IngredientEntry> _all = new List<IngredientEntry>();
     private string _lastQuery = "";
@@ -45,18 +55,90 @@ public class IngredientSearchController : MonoBehaviour
 
     private IEnumerator LoadIngredientsThenRefresh()
     {
-        yield return LoadIngredientsFromStreamingAssets();
+        yield return LoadIngredients();
         Refresh(string.IsNullOrEmpty(_lastQuery) ? (searchInput ? searchInput.text : "") : _lastQuery);
     }
 
-    private IEnumerator LoadIngredientsFromStreamingAssets()
+    private IEnumerator LoadIngredients()
     {
         _all.Clear();
 
-        string path = System.IO.Path.Combine(Application.streamingAssetsPath, ingredientsFileName);
+        // 1) Se preferiamo persistentDataPath, assicuriamoci che esista una copia lì.
+        string persistentPath = GetPersistentIngredientsPath();
+        if (preferPersistentDataPath)
+        {
+            if (!File.Exists(persistentPath))
+                yield return CopyIngredientsFromStreamingAssetsToPersistent(persistentPath);
+        }
+
+        // 2) Carica JSON dalla fonte scelta
+        string json = null;
+        if (preferPersistentDataPath && File.Exists(persistentPath))
+        {
+            try
+            {
+                json = File.ReadAllText(persistentPath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"IngredientSearchController: errore lettura persistent '{persistentPath}'. {e.Message}");
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(json))
+            yield return LoadJsonFromStreamingAssets(s => json = s);
+
+        if (string.IsNullOrWhiteSpace(json))
+            yield break;
+
+        IngredientsRoot root;
+        try
+        {
+            root = JsonUtility.FromJson<IngredientsRoot>(json);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"IngredientSearchController: JSON non valido. {e.Message}");
+            yield break;
+        }
+
+        if (root?.ingredients == null)
+            yield break;
+
+        _all.AddRange(root.ingredients.Where(i => i != null && !string.IsNullOrWhiteSpace(i.id)));
+    }
+
+    private string GetPersistentIngredientsPath()
+    {
+        string dir = Path.Combine(Application.persistentDataPath, PersistentSubfolder);
+        return Path.Combine(dir, ingredientsFileName);
+    }
+
+    private IEnumerator CopyIngredientsFromStreamingAssetsToPersistent(string persistentPath)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(persistentPath) ?? Application.persistentDataPath);
+
+        string json = null;
+        yield return LoadJsonFromStreamingAssets(s => json = s);
+        if (string.IsNullOrWhiteSpace(json))
+            yield break;
+
+        try
+        {
+            File.WriteAllText(persistentPath, json);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"IngredientSearchController: errore scrittura persistent '{persistentPath}'. {e.Message}");
+        }
+    }
+
+    private IEnumerator LoadJsonFromStreamingAssets(Action<string> onLoaded)
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, ingredientsFileName);
         string url = path;
 
-        // Android requires UnityWebRequest even for local StreamingAssets.
+        // Android/iOS possono richiedere UnityWebRequest anche per path locali nel bundle.
         if (!url.Contains("://"))
             url = "file://" + url;
 
@@ -66,26 +148,11 @@ public class IngredientSearchController : MonoBehaviour
 
             if (req.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"IngredientSearchController: errore caricamento '{ingredientsFileName}'. {req.error}");
+                Debug.LogError($"IngredientSearchController: errore caricamento StreamingAssets '{ingredientsFileName}'. {req.error}");
                 yield break;
             }
 
-            string json = req.downloadHandler.text;
-            IngredientsRoot root;
-            try
-            {
-                root = JsonUtility.FromJson<IngredientsRoot>(json);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"IngredientSearchController: JSON non valido. {e.Message}");
-                yield break;
-            }
-
-            if (root?.ingredients == null)
-                yield break;
-
-            _all.AddRange(root.ingredients.Where(i => i != null && !string.IsNullOrWhiteSpace(i.id)));
+            onLoaded?.Invoke(req.downloadHandler.text);
         }
     }
 
@@ -154,6 +221,9 @@ public class IngredientSearchController : MonoBehaviour
             if (nameText) nameText.text = string.IsNullOrEmpty(ing.name) ? ing.id : ing.name;
             if (typeText) typeText.text = CategoryLabel(ing);
             if (emojiText) emojiText.text = EmojiFor(ing);
+
+            // Immagine ingrediente (se presente nel prefab)
+            TryAssignIngredientImage(row.transform, ing.id);
 
             if (addBtn)
             {
@@ -248,6 +318,31 @@ public class IngredientSearchController : MonoBehaviour
     {
         for (int i = parent.childCount - 1; i >= 0; i--)
             Destroy(parent.GetChild(i).gameObject);
+    }
+
+    private void TryAssignIngredientImage(Transform rowTransform, string ingredientId)
+    {
+        if (rowTransform == null || string.IsNullOrWhiteSpace(ingredientId))
+            return;
+
+        // Nomi prefab supportati: "Image" (Ingrediente.prefab), "Immagine" (Alcolico.prefab)
+        Image img =
+            rowTransform.Find("ImgIngredient")?.GetComponent<Image>() ??
+            rowTransform.Find("Immagine")?.GetComponent<Image>() ??
+            rowTransform.Find("Image")?.GetComponent<Image>();
+
+        if (img == null)
+            return;
+
+        string resourcePath = $"{ResourcesImagesFolder}/{ingredientId}";
+        Sprite s = Resources.Load<Sprite>(resourcePath) ?? fallbackIngredientSprite;
+
+        if (s == null)
+            return;
+
+        img.sprite = s;
+        img.preserveAspect = true;
+        img.enabled = true;
     }
 
     [Serializable]
