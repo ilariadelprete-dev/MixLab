@@ -22,6 +22,10 @@ public class UIManager : MonoBehaviour
 {
     private const string ResourcesImagesFolder = "IngredientsImages";
 
+    [Header("--- Home (opzioni lista) ---")]
+    [Tooltip("Se true: mostra solo i cocktail realizzabili con l'inventario. Se false: mostra tutto il catalogo.")]
+    [SerializeField] private bool showOnlyMakeableCocktails = false;
+
     // =========================================================
     //  RIFERIMENTI AI PANNELLI (assegna nell'Inspector)
     // =========================================================
@@ -39,6 +43,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtMocktailCount;  // "6"
     [SerializeField] private Transform      cocktailListParent; // contenitore scroll list
     [SerializeField] private GameObject     cocktailCardPrefab; // prefab card cocktail
+
+    [Header("--- Home (inventario preview) ---")]
+    [Tooltip("Contenitore (es. griglia/orizzontale) per mostrare alcune bottiglie nella Home.")]
+    [SerializeField] private Transform homeBottlePreviewParent;
+    [Tooltip("Prefab card bottiglia per la preview Home. Se vuoto usa `bottleCardPrefab`.")]
+    [SerializeField] private GameObject homeBottleCardPrefab;
+    [SerializeField] private int homeBottlePreviewMax = 8;
+    [SerializeField] private bool debugHomeInventoryPreview = false;
 
     // ── Inventory Screen ──────────────────────────────────────
     [Header("--- Inventario ---")]
@@ -99,11 +111,21 @@ public class UIManager : MonoBehaviour
     //  LIFECYCLE
     // =========================================================
 
+    private void Awake()
+    {
+        // Garantisce la presenza dei manager necessari anche se non sono stati messi in scena
+        EnsureManager<InventoryManager>("InventoryManager");
+        EnsureManager<CocktailDatabase>("CocktailDatabase");
+    }
+
     private void Start()
     {
         // Ascolta i cambiamenti all'inventario per aggiornare l'UI
-        InventoryManager.Instance.OnInventoryChanged += RefreshHome;
-        InventoryManager.Instance.OnInventoryChanged += RefreshInventory;
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.OnInventoryChanged += RefreshHome;
+            InventoryManager.Instance.OnInventoryChanged += RefreshInventory;
+        }
 
         ShowHome(); // apre sempre l'app sulla Home
     }
@@ -124,26 +146,26 @@ public class UIManager : MonoBehaviour
 
     public void ShowHome()
     {
-        //SwitchPanel(panelHome);
+        SwitchPanel(panelHome);
         RefreshHome();
     }
 
     public void ShowInventory()
     {
-        //SwitchPanel(panelInventory);
+        SwitchPanel(panelInventory);
         RefreshInventory();
     }
 
     public void ShowDetail(Cocktail cocktail)
     {
         _selectedCocktail = cocktail;
-        //SwitchPanel(panelDetail);
+        SwitchPanel(panelDetail);
         RefreshDetail();
     }
 
     public void ShowAdd()
     {
-        //SwitchPanel(panelAdd);
+        SwitchPanel(panelAdd);
         RefreshAdd("");
     }
 
@@ -155,22 +177,22 @@ public class UIManager : MonoBehaviour
     }
 
     // Attiva il pannello richiesto, nasconde tutti gli altri
-  //  private void SwitchPanel(GameObject target)
-  //  {
-    //    if (panelHome != null) panelHome.SetActive(false);
-     //   if (panelInventory != null) panelInventory.SetActive(false);
-      //  if (panelDetail != null) panelDetail.SetActive(false);
-       // if (panelAdd != null) panelAdd.SetActive(false);
+    private void SwitchPanel(GameObject target)
+    {
+        if (panelHome != null) panelHome.SetActive(false);
+        if (panelInventory != null) panelInventory.SetActive(false);
+        if (panelDetail != null) panelDetail.SetActive(false);
+        if (panelAdd != null) panelAdd.SetActive(false);
 
-        //if (target == null)
-        //{
-         //   Debug.LogError("UIManager.SwitchPanel: target panel è null. Assegna i pannelli nell'Inspector.");
-          //  return;
-        //}
+        if (target == null)
+        {
+            Debug.LogError("UIManager.SwitchPanel: target panel è null. Assegna i pannelli nell'Inspector.");
+            return;
+        }
 
-        //target.SetActive(true);
-        //_currentPanel = target;
-    //}
+        target.SetActive(true);
+        _currentPanel = target;
+    }
 
     // =========================================================
     //  REFRESH — aggiornano i contenuti di ogni schermata
@@ -179,27 +201,47 @@ public class UIManager : MonoBehaviour
     // ── HOME ──────────────────────────────────────────────────
     private void RefreshHome()
     {
+        if (CocktailDatabase.Instance == null)
+        {
+            Debug.LogError("UIManager: CocktailDatabase mancante in scena.");
+            return;
+        }
+
         // Aggiorna le statistiche nell'hero banner
-        if (txtBottleCount)   txtBottleCount.text   = InventoryManager.Instance.Count.ToString();
-        if (txtCocktailCount) txtCocktailCount.text  = CocktailDatabase.Instance.MakeableCount.ToString();
-        if (txtMocktailCount) txtMocktailCount.text  = CocktailDatabase.Instance.MocktailCount.ToString();
+        int bottleCount = InventoryManager.Instance != null ? InventoryManager.Instance.Count : 0;
+        if (txtBottleCount) txtBottleCount.text = bottleCount.ToString();
+
+        // Se non abbiamo inventory, i "makeable" saranno 0: evitiamo di far sembrare l'app rotta
+        if (txtCocktailCount)
+            txtCocktailCount.text = InventoryManager.Instance != null
+                ? CocktailDatabase.Instance.MakeableCount.ToString()
+                : CocktailDatabase.Instance.AllCocktails.Count.ToString();
+
+        if (txtMocktailCount)
+            txtMocktailCount.text = InventoryManager.Instance != null
+                ? CocktailDatabase.Instance.MocktailCount.ToString()
+                : "0";
+
+        RefreshHomeBottlePreview();
 
         // Ripopola la lista cocktail
         if (cocktailListParent == null || cocktailCardPrefab == null) return;
 
         ClearChildren(cocktailListParent);
 
-        List<Cocktail> makeable = CocktailDatabase.Instance.GetMakeableCocktails();
+        List<Cocktail> list = showOnlyMakeableCocktails && InventoryManager.Instance != null
+            ? CocktailDatabase.Instance.GetMakeableCocktails()
+            : new List<Cocktail>(CocktailDatabase.Instance.AllCocktails);
 
-        if (makeable.Count == 0)
+        if (list.Count == 0)
         {
             // Nessun cocktail disponibile — mostra messaggio vuoto
             // (puoi aggiungere un TextMeshPro "vuoto" nell'Inspector)
-            Debug.Log("UIManager: nessun cocktail realizzabile con l'inventario corrente.");
+            Debug.Log("UIManager: nessun cocktail da mostrare.");
             return;
         }
 
-        foreach (Cocktail cocktail in makeable)
+        foreach (Cocktail cocktail in list)
         {
             GameObject card = Instantiate(cocktailCardPrefab, cocktailListParent);
 
@@ -232,6 +274,99 @@ public class UIManager : MonoBehaviour
             Button btn = card.GetComponent<Button>();
             if (btn) btn.onClick.AddListener(() => ShowDetail(captured));
         }
+    }
+
+    private void RefreshHomeBottlePreview()
+    {
+        if (homeBottlePreviewParent == null)
+        {
+            if (debugHomeInventoryPreview)
+                Debug.Log("UIManager(HomePreview): homeBottlePreviewParent NON assegnato → skip.");
+            return;
+        }
+
+        ClearChildren(homeBottlePreviewParent);
+
+        if (InventoryManager.Instance == null)
+        {
+            if (debugHomeInventoryPreview)
+                Debug.Log("UIManager(HomePreview): InventoryManager.Instance null → skip.");
+            return;
+        }
+
+        GameObject prefab = homeBottleCardPrefab != null ? homeBottleCardPrefab : bottleCardPrefab;
+        if (prefab == null)
+        {
+            if (debugHomeInventoryPreview)
+                Debug.Log("UIManager(HomePreview): nessun prefab bottiglia assegnato (homeBottleCardPrefab/bottleCardPrefab) → skip.");
+            return;
+        }
+
+        if (debugHomeInventoryPreview)
+            Debug.Log($"UIManager(HomePreview): bottiglie in inventario = {InventoryManager.Instance.Bottles.Count} (max {homeBottlePreviewMax}).");
+
+        int shown = 0;
+        foreach (Bottle bottle in InventoryManager.Instance.Bottles)
+        {
+            if (shown >= Mathf.Max(0, homeBottlePreviewMax))
+                break;
+
+            GameObject card = Instantiate(prefab, homeBottlePreviewParent);
+
+            // Supporta prefab `Alcolico` + altri
+            TextMeshProUGUI nameText =
+                card.transform.Find("TxtName")?.GetComponent<TextMeshProUGUI>() ??
+                card.transform.Find("Nome/Text (TMP)")?.GetComponent<TextMeshProUGUI>() ??
+                card.transform.Find("Text (TMP)")?.GetComponent<TextMeshProUGUI>();
+
+            TextMeshProUGUI typeText =
+                card.transform.Find("TxtType")?.GetComponent<TextMeshProUGUI>() ??
+                card.transform.Find("Nome/Text (TMP) (1)")?.GetComponent<TextMeshProUGUI>() ??
+                card.transform.Find("Text (TMP) (1)")?.GetComponent<TextMeshProUGUI>();
+
+            TextMeshProUGUI emojiText = card.transform.Find("TxtEmoji")?.GetComponent<TextMeshProUGUI>();
+            Slider fillBar = card.transform.Find("FillBar")?.GetComponent<Slider>();
+
+            if (nameText) nameText.text = bottle.displayName;
+            if (typeText) typeText.text = bottle.category;
+            if (emojiText) emojiText.text = bottle.emoji;
+            if (fillBar) fillBar.value = bottle.fillLevel;
+
+            // Immagine (nel prefab `Alcolico` si chiama "Immagine")
+            TryAssignIngredientImage(card.transform, bottle.id);
+
+            // In Home non serve un pulsante "add": se esiste lo disabilitiamo
+            Button addBtn =
+                card.transform.Find("BtnAdd")?.GetComponent<Button>() ??
+                card.GetComponent<Button>();
+            if (addBtn != null && addBtn.gameObject.name == "BtnAdd")
+                addBtn.gameObject.SetActive(false);
+
+            BottleCardController controller = card.GetComponent<BottleCardController>();
+            if (controller) controller.Initialize(bottle.id, bottle.displayName);
+
+            shown++;
+        }
+    }
+
+    private static void EnsureManager<T>(string goName) where T : MonoBehaviour
+    {
+        if (typeof(T) == typeof(InventoryManager))
+        {
+            if (InventoryManager.Instance != null) return;
+        }
+        else if (typeof(T) == typeof(CocktailDatabase))
+        {
+            if (CocktailDatabase.Instance != null) return;
+        }
+        else
+        {
+            // fallback: se esiste già in scena, non crearne un altro
+            if (FindAnyObjectByType<T>() != null) return;
+        }
+
+        GameObject go = new GameObject(goName);
+        go.AddComponent<T>();
     }
 
     // ── INVENTARIO ────────────────────────────────────────────
