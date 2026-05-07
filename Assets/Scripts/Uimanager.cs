@@ -1,9 +1,13 @@
 
 
 using System.Collections.Generic;
+using System.Collections;
+using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;   // TextMeshPro — assicurati di averlo importato dal Package Manager
+using UnityEngine.Networking;
 
 // ============================================================
 //  MixLab — UIManager.cs
@@ -21,6 +25,8 @@ using TMPro;   // TextMeshPro — assicurati di averlo importato dal Package Man
 public class UIManager : MonoBehaviour
 {
     private const string ResourcesImagesFolder = "IngredientsImages";
+    private const string HomeBottlePreviewContainerName = "__HomeBottlePreview";
+    private const string HomeBottleItemPrefix = "__HomeBottleItem__";
 
     [Header("--- Home (opzioni lista) ---")]
     [Tooltip("Se true: mostra solo i cocktail realizzabili con l'inventario. Se false: mostra tutto il catalogo.")]
@@ -80,6 +86,12 @@ public class UIManager : MonoBehaviour
     [Tooltip("Fallback se non troviamo lo sprite in Resources/IngredientsImages/<id>.")]
     [SerializeField] private Sprite fallbackIngredientSprite;
 
+    [Header("--- Sorgente ingredienti (Add) ---")]
+    [SerializeField] private string ingredientsFileName = "ingredients.json";
+    [SerializeField] private bool preferPersistentDataPath = true;
+    [SerializeField] private string persistentSubfolder = "Data";
+    [SerializeField] private bool hideAlreadyOwnedInAdd = false;
+
     // =========================================================
     //  STATO INTERNO
     // =========================================================
@@ -127,7 +139,7 @@ public class UIManager : MonoBehaviour
             InventoryManager.Instance.OnInventoryChanged += RefreshInventory;
         }
 
-        ShowHome(); // apre sempre l'app sulla Home
+        StartCoroutine(LoadSpiritCatalogThenShowHome());
     }
 
     private void OnDestroy()
@@ -227,7 +239,7 @@ public class UIManager : MonoBehaviour
         // Ripopola la lista cocktail
         if (cocktailListParent == null || cocktailCardPrefab == null) return;
 
-        ClearChildren(cocktailListParent);
+        ClearChildrenCocktailList(cocktailListParent);
 
         List<Cocktail> list = showOnlyMakeableCocktails && InventoryManager.Instance != null
             ? CocktailDatabase.Instance.GetMakeableCocktails()
@@ -285,7 +297,8 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        ClearChildren(homeBottlePreviewParent);
+        // Pulisce SOLO gli item della preview, non tutto il parent.
+        ClearHomeBottleItems(homeBottlePreviewParent);
 
         if (InventoryManager.Instance == null)
         {
@@ -303,7 +316,7 @@ public class UIManager : MonoBehaviour
         }
 
         if (debugHomeInventoryPreview)
-            Debug.Log($"UIManager(HomePreview): bottiglie in inventario = {InventoryManager.Instance.Bottles.Count} (max {homeBottlePreviewMax}).");
+            Debug.Log($"UIManager(HomePreview): bottiglie in inventario = {InventoryManager.Instance.Bottles.Count} (max {homeBottlePreviewMax}). Parent='{homeBottlePreviewParent.name}'");
 
         int shown = 0;
         foreach (Bottle bottle in InventoryManager.Instance.Bottles)
@@ -311,7 +324,9 @@ public class UIManager : MonoBehaviour
             if (shown >= Mathf.Max(0, homeBottlePreviewMax))
                 break;
 
-            GameObject card = Instantiate(prefab, homeBottlePreviewParent);
+            GameObject card = Instantiate(prefab);
+            card.name = $"{HomeBottleItemPrefix}{bottle.id}";
+            card.transform.SetParent(homeBottlePreviewParent, worldPositionStays: false);
 
             // Supporta prefab `Alcolico` + altri
             TextMeshProUGUI nameText =
@@ -349,6 +364,33 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private static bool IsHomeBottleItem(Transform t)
+    {
+        return t != null && t.name != null && t.name.StartsWith(HomeBottleItemPrefix);
+    }
+
+    private static void ClearHomeBottleItems(Transform parent)
+    {
+        if (parent == null) return;
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            Transform c = parent.GetChild(i);
+            if (IsHomeBottleItem(c))
+                Destroy(c.gameObject);
+        }
+    }
+
+    private static void ClearChildrenCocktailList(Transform parent)
+    {
+        if (parent == null) return;
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            Transform c = parent.GetChild(i);
+            if (IsHomeBottleItem(c)) continue;
+            Destroy(c.gameObject);
+        }
+    }
+
     private static void EnsureManager<T>(string goName) where T : MonoBehaviour
     {
         if (typeof(T) == typeof(InventoryManager))
@@ -367,6 +409,104 @@ public class UIManager : MonoBehaviour
 
         GameObject go = new GameObject(goName);
         go.AddComponent<T>();
+    }
+
+    private IEnumerator LoadSpiritCatalogThenShowHome()
+    {
+        yield return LoadSpiritCatalogFromJson();
+        ShowHome(); // apre sempre l'app sulla Home
+    }
+
+    private IEnumerator LoadSpiritCatalogFromJson()
+    {
+        string json = null;
+        string persistentPath = Path.Combine(Application.persistentDataPath, persistentSubfolder, ingredientsFileName);
+        string streamingJson = null;
+
+        // 1) Prova lettura diretta file (Editor/Desktop): piu' affidabile di UnityWebRequest per file locali.
+        string streamingPath = Path.Combine(Application.streamingAssetsPath, ingredientsFileName);
+        try
+        {
+            if (File.Exists(streamingPath))
+                streamingJson = File.ReadAllText(streamingPath);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"UIManager: errore lettura diretta StreamingAssets '{ingredientsFileName}': {e.Message}");
+        }
+
+        // 2) Fallback UnityWebRequest (Android/iOS o path speciali)
+        if (string.IsNullOrWhiteSpace(streamingJson))
+        {
+            string url = streamingPath.Contains("://") ? streamingPath : "file://" + streamingPath;
+            using (UnityWebRequest req = UnityWebRequest.Get(url))
+            {
+                yield return req.SendWebRequest();
+                if (req.result == UnityWebRequest.Result.Success)
+                    streamingJson = req.downloadHandler.text;
+                else
+                    Debug.LogWarning($"UIManager: errore caricamento '{ingredientsFileName}' da StreamingAssets: {req.error}");
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(streamingJson))
+        {
+            json = streamingJson;
+
+            if (preferPersistentDataPath)
+            {
+                try
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(persistentPath) ?? Application.persistentDataPath);
+                    File.WriteAllText(persistentPath, streamingJson);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"UIManager: impossibile sincronizzare persistent ingredients. {e.Message}");
+                }
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(json) && preferPersistentDataPath && File.Exists(persistentPath))
+        {
+            try
+            {
+                json = File.ReadAllText(persistentPath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"UIManager: errore lettura ingredienti persistent. {e.Message}");
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(json))
+            yield break; // fallback: resta la lista hardcoded
+
+        IngredientsRoot root = null;
+        try
+        {
+            root = JsonUtility.FromJson<IngredientsRoot>(json);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"UIManager: JSON ingredienti non valido. {e.Message}");
+        }
+
+        if (root?.ingredients == null || root.ingredients.Count == 0)
+            yield break; // fallback
+
+        _spiritCatalog.Clear();
+        foreach (IngredientEntry ing in root.ingredients)
+        {
+            if (ing == null || string.IsNullOrWhiteSpace(ing.id)) continue;
+
+            string displayName = string.IsNullOrWhiteSpace(ing.name) ? ing.id : ing.name;
+            string category = CategoryLabel(ing);
+            string emoji = EmojiFor(ing);
+            _spiritCatalog.Add(new Bottle(ing.id, displayName, category, emoji));
+        }
+
+        Debug.Log($"UIManager: ingredienti caricati da JSON = {_spiritCatalog.Count}");
     }
 
     // ── INVENTARIO ────────────────────────────────────────────
@@ -464,16 +604,29 @@ public class UIManager : MonoBehaviour
         if (spiritsListParent == null || spiritRowPrefab == null) return;
         ClearChildren(spiritsListParent);
 
-        string f = filter.ToLower();
+        RectTransform contentRT = spiritsListParent as RectTransform;
+        RectTransform prefabRT = spiritRowPrefab.GetComponent<RectTransform>();
+        float rowHeight = prefabRT != null ? prefabRT.rect.height : 110f;
+        float rowSpacing = 12f;
+        bool hasLayoutGroup = spiritsListParent.GetComponent<LayoutGroup>() != null;
+
+        string f = (filter ?? string.Empty).Trim().ToLowerInvariant();
+        int laidOutIndex = 0;
         foreach (Bottle spirit in _spiritCatalog)
         {
             // Filtra per testo se l'utente sta cercando
-            if (!string.IsNullOrEmpty(f) &&
-                !spirit.displayName.ToLower().Contains(f) &&
-                !spirit.category.ToLower().Contains(f)) continue;
+            if (!string.IsNullOrEmpty(f))
+            {
+                string name = (spirit.displayName ?? string.Empty).ToLowerInvariant();
+                string category = (spirit.category ?? string.Empty).ToLowerInvariant();
+                string id = (spirit.id ?? string.Empty).ToLowerInvariant();
+                if (!name.Contains(f) && !category.Contains(f) && !id.Contains(f))
+                    continue;
+            }
 
             // Non mostrare bottiglie già nell'inventario
             bool alreadyOwned = InventoryManager.Instance.HasBottle(spirit.id);
+            if (hideAlreadyOwnedInAdd && alreadyOwned) continue;
 
             GameObject row = Instantiate(spiritRowPrefab, spiritsListParent);
             TextMeshProUGUI nameText  = row.transform.Find("TxtName")?.GetComponent<TextMeshProUGUI>();
@@ -498,6 +651,27 @@ public class UIManager : MonoBehaviour
                     RefreshAdd(searchInput ? searchInput.text : "");
                 });
             }
+
+            if (!hasLayoutGroup)
+            {
+                RectTransform rowRT = row.GetComponent<RectTransform>();
+                if (rowRT != null)
+                {
+                    rowRT.anchorMin = new Vector2(0f, 1f);
+                    rowRT.anchorMax = new Vector2(1f, 1f);
+                    rowRT.pivot = new Vector2(0.5f, 1f);
+                    rowRT.anchoredPosition = new Vector2(0f, -laidOutIndex * (rowHeight + rowSpacing));
+                    rowRT.sizeDelta = new Vector2(0f, rowHeight);
+                }
+            }
+
+            laidOutIndex++;
+        }
+
+        if (!hasLayoutGroup && contentRT != null)
+        {
+            float totalH = Mathf.Max(0f, laidOutIndex * (rowHeight + rowSpacing) - rowSpacing);
+            contentRT.sizeDelta = new Vector2(contentRT.sizeDelta.x, totalH);
         }
     }
 
@@ -547,5 +721,66 @@ public class UIManager : MonoBehaviour
         img.sprite = s;
         img.preserveAspect = true;
         img.enabled = true;
+    }
+
+    private static string CategoryLabel(IngredientEntry ing)
+    {
+        if (ing == null) return "Altro";
+        string t = (ing.type ?? "").ToLowerInvariant();
+        return t switch
+        {
+            "spirit" => "Distillato",
+            "bitter" => "Aperitivo/Amaro",
+            "liqueur" => "Liquore",
+            "wine" => "Vino",
+            "juice" => "Succo",
+            "mixer" => "Mixer",
+            "sweetener" => "Dolcificante",
+            "herb" => "Erbe/Spice",
+            "other" => "Altro",
+            _ => string.IsNullOrEmpty(ing.type) ? "Altro" : ing.type
+        };
+    }
+
+    private static string EmojiFor(IngredientEntry ing)
+    {
+        if (ing == null) return "➕";
+        string t = (ing.type ?? "").ToLowerInvariant();
+        string st = (ing.subtype ?? "").ToLowerInvariant();
+
+        if (t == "spirit")
+        {
+            if (st.Contains("gin")) return "🌿";
+            if (st.Contains("vodka")) return "🫧";
+            if (st.Contains("rum")) return "🫚";
+            if (st.Contains("tequila") || st.Contains("mezcal")) return "🌵";
+            if (st.Contains("whiskey") || st.Contains("whisky") || st.Contains("bourbon") || st.Contains("rye")) return "🥃";
+            if (st.Contains("brandy") || st.Contains("cognac")) return "🍇";
+            return "🍶";
+        }
+
+        if (t == "bitter") return "🌹";
+        if (t == "liqueur") return "🍊";
+        if (t == "wine") return "🍷";
+        if (t == "juice") return "🧃";
+        if (t == "mixer") return "🥤";
+        if (t == "sweetener") return "🍯";
+        if (t == "herb") return "🌱";
+        return "➕";
+    }
+
+    [Serializable]
+    private class IngredientsRoot
+    {
+        public List<IngredientEntry> ingredients;
+    }
+
+    [Serializable]
+    private class IngredientEntry
+    {
+        public string id;
+        public string name;
+        public string type;
+        public string subtype;
     }
 }

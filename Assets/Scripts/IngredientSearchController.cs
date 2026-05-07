@@ -62,18 +62,28 @@ public class IngredientSearchController : MonoBehaviour
     private IEnumerator LoadIngredients()
     {
         _all.Clear();
-
-        // 1) Se preferiamo persistentDataPath, assicuriamoci che esista una copia lì.
         string persistentPath = GetPersistentIngredientsPath();
-        if (preferPersistentDataPath)
+        string json = null;
+
+        // 1) Prova sempre StreamingAssets per ottenere dati aggiornati in Play.
+        yield return LoadJsonFromStreamingAssets(s => json = s);
+
+        // 2) Se richiesto, sincronizza la copia in persistentDataPath.
+        if (preferPersistentDataPath && !string.IsNullOrWhiteSpace(json))
         {
-            if (!File.Exists(persistentPath))
-                yield return CopyIngredientsFromStreamingAssetsToPersistent(persistentPath);
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(persistentPath) ?? Application.persistentDataPath);
+                File.WriteAllText(persistentPath, json);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"IngredientSearchController: impossibile sincronizzare persistent '{persistentPath}'. {e.Message}");
+            }
         }
 
-        // 2) Carica JSON dalla fonte scelta
-        string json = null;
-        if (preferPersistentDataPath && File.Exists(persistentPath))
+        // 3) Fallback al persistent solo se lo streaming non e' disponibile.
+        if (string.IsNullOrWhiteSpace(json) && preferPersistentDataPath && File.Exists(persistentPath))
         {
             try
             {
@@ -84,9 +94,6 @@ public class IngredientSearchController : MonoBehaviour
                 Debug.LogError($"IngredientSearchController: errore lettura persistent '{persistentPath}'. {e.Message}");
             }
         }
-
-        if (string.IsNullOrWhiteSpace(json))
-            yield return LoadJsonFromStreamingAssets(s => json = s);
 
         if (string.IsNullOrWhiteSpace(json))
             yield break;
@@ -106,6 +113,7 @@ public class IngredientSearchController : MonoBehaviour
             yield break;
 
         _all.AddRange(root.ingredients.Where(i => i != null && !string.IsNullOrWhiteSpace(i.id)));
+        Debug.Log($"IngredientSearchController: ingredienti caricati = {_all.Count}");
     }
 
     private string GetPersistentIngredientsPath()
@@ -196,7 +204,10 @@ public class IngredientSearchController : MonoBehaviour
             if (shown >= maxResults) break;
 
             bool alreadyOwned = InventoryManager.Instance != null && InventoryManager.Instance.HasBottle(ing.id);
-            if (hideAlreadyOwned && alreadyOwned) continue;
+            // Durante una ricerca testuale mostra anche gli ingredienti gia' posseduti
+            // (restano non cliccabili), cosi' l'utente li trova sempre.
+            bool isSearching = !string.IsNullOrEmpty(q);
+            if (hideAlreadyOwned && alreadyOwned && !isSearching) continue;
 
             GameObject row = Instantiate(rowPrefab);
             row.transform.SetParent(resultsParent, worldPositionStays: false);
